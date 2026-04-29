@@ -1,0 +1,12 @@
+package bg.schoolinventory.backend.service.auth;
+
+import bg.schoolinventory.backend.dto.LoginRequestDto;
+import bg.schoolinventory.backend.dto.LoginResponseDto;
+import bg.schoolinventory.backend.dto.RegisterRequestDto;
+
+public interface AuthorizationService {
+    void register(RegisterRequestDto registerRequestDto);
+    LoginResponseDto login(LoginRequestDto loginRequestDto);
+    void deleteAccount(String username);
+    void changePassword(String username, String oldPassword, String newPassword);
+}
