@@ -55,6 +55,8 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
         if (userRepository.count() == 0) {
             user.setRole(Role.ADMIN);
+        } else {
+            user.setRole(Role.USER);
         }
 
         userRepository.save(user);

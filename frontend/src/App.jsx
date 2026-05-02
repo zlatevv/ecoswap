@@ -3,6 +3,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import ProductDetail from './pages/ProductDetail';
 
 export default function App() {
     return (
@@ -19,6 +20,7 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
+                <Route path="/products/:id" element={<ProtectedRoute><ProductDetail /></ProtectedRoute>} />
             </Routes>
         </BrowserRouter>
     );

@@ -22,6 +22,12 @@ public class ProductController {
         this.productService = productService;
         this.userRepository = userRepository;
     }
+    @GetMapping("/all")
+    public ResponseEntity<List<Product>> getAllProducts() {
+        List<Product> products = productService.getAllProducts();
+        return ResponseEntity.ok(products);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProduct(@PathVariable Long id) {
         Product product = productService.getProduct(id);

@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
     Leaf, LayoutDashboard, Tag, RefreshCw, TrendingUp, Award,
-    LogOut, Plus, MapPin, Search, X, User, ChevronDown,
+    LogOut, Plus, MapPin, Search, X, ChevronDown,
     PackageOpen, Trash2, DollarSign
 } from 'lucide-react';
+import { Settings as SettingsIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import Settings from './Settings';
+import SwapRequests from './SwapRequests';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -42,13 +46,18 @@ function StatCard({ title, value, icon: Icon, color, bg }) {
 }
 
 function ProductCard({ item, onDelete, showDelete }) {
+    const navigate = useNavigate();
+
     return (
-        <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm hover:shadow-lg transition-all group cursor-pointer flex flex-col relative">
+        <div
+            onClick={() => navigate(`/products/${item.id}`)}
+            className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm hover:shadow-lg transition-all group cursor-pointer flex flex-col relative"
+        >
             <div className="relative h-40 bg-stone-100 flex items-center justify-center overflow-hidden">
                 <PackageOpen className="h-12 w-12 text-stone-300" />
                 {showDelete && (
                     <button
-                        onClick={() => onDelete(item.id)}
+                        onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}
                         className="absolute top-2 right-2 bg-white rounded-lg p-1.5 shadow hover:bg-rose-50 hover:text-rose-600 transition-colors"
                     >
                         <Trash2 className="h-4 w-4" />
@@ -169,7 +178,7 @@ function ListItemModal({ onClose, onSuccess }) {
 // ── main dashboard ────────────────────────────────────────────────────────────
 
 const EcoSwapDashboard = () => {
-    const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'myListings'
+    const [activeTab, setActiveTab] = useState('dashboard');
     const [allListings, setAllListings] = useState([]);
     const [myListings, setMyListings] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -178,10 +187,8 @@ const EcoSwapDashboard = () => {
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [search, setSearch] = useState('');
 
-    // Decode user info from JWT
     const token = sessionStorage.getItem('jwt_token');
     const jwt = parseJwt(token);
-
     const username = jwt?.sub || 'User';
     const userId = jwt?.userId || null;
 
@@ -191,17 +198,15 @@ const EcoSwapDashboard = () => {
         setIsLoading(true);
         setError(null);
         try {
-            if (!userId) throw new Error('Could not resolve user ID from token.');
-            const res = await fetch(`${API}/products/user/${userId}`, { headers: authHeaders() });
+            const res = await fetch(`${API}/products/all`, { headers: authHeaders() });
             if (!res.ok) throw new Error('Failed to fetch listings.');
-            const data = await res.json();
-            setAllListings(data);
+            setAllListings(await res.json());
         } catch (e) {
             setError(e.message);
         } finally {
             setIsLoading(false);
         }
-    }, [userId]);
+    }, []);
 
     const fetchMyListings = useCallback(async () => {
         if (!userId) return;
@@ -221,7 +226,7 @@ const EcoSwapDashboard = () => {
 
     const handleLogout = () => {
         sessionStorage.removeItem('jwt_token');
-        window.location.href = '/login'; // adjust to your login route
+        window.location.href = '/login';
     };
 
     const handleDelete = async (id) => {
@@ -255,6 +260,13 @@ const EcoSwapDashboard = () => {
         { title: 'Eco Points', value: '850', icon: Award, color: 'text-amber-500', bg: 'bg-amber-100' },
     ];
 
+    const navItems = [
+        { key: 'dashboard',     label: 'Dashboard',      icon: LayoutDashboard },
+        { key: 'myListings',    label: 'My Listings',    icon: Tag },
+        { key: 'swapRequests',  label: 'Swap Requests',  icon: RefreshCw },
+        { key: 'settings',      label: 'Settings',       icon: SettingsIcon },
+    ];
+
     // ── render ────────────────────────────────────────────────────────────────
 
     return (
@@ -270,31 +282,22 @@ const EcoSwapDashboard = () => {
                 </div>
 
                 <nav className="flex-1 px-4 py-6 space-y-2">
-                    <button
-                        onClick={() => setActiveTab('dashboard')}
-                        className={`w-full flex items-center px-4 py-3 rounded-xl font-medium transition-colors ${
-                            activeTab === 'dashboard'
-                                ? 'bg-emerald-50 text-emerald-700'
-                                : 'text-stone-500 hover:bg-stone-50 hover:text-stone-900'
-                        }`}
-                    >
-                        <LayoutDashboard className="h-5 w-5 mr-3" />
-                        Dashboard
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('myListings')}
-                        className={`w-full flex items-center px-4 py-3 rounded-xl font-medium transition-colors ${
-                            activeTab === 'myListings'
-                                ? 'bg-emerald-50 text-emerald-700'
-                                : 'text-stone-500 hover:bg-stone-50 hover:text-stone-900'
-                        }`}
-                    >
-                        <Tag className="h-5 w-5 mr-3" />
-                        My Listings
-                    </button>
+                    {navItems.map(({ key, label, icon: Icon }) => (
+                        <button
+                            key={key}
+                            onClick={() => setActiveTab(key)}
+                            className={`w-full flex items-center px-4 py-3 rounded-xl font-medium transition-colors ${
+                                activeTab === key
+                                    ? 'bg-emerald-50 text-emerald-700'
+                                    : 'text-stone-500 hover:bg-stone-50 hover:text-stone-900'
+                            }`}
+                        >
+                            <Icon className="h-5 w-5 mr-3" />
+                            {label}
+                        </button>
+                    ))}
                 </nav>
 
-                {/* Logout at bottom of sidebar */}
                 <div className="px-4 py-4 border-t border-stone-100">
                     <button
                         onClick={handleLogout}
@@ -322,7 +325,6 @@ const EcoSwapDashboard = () => {
                         />
                     </div>
 
-                    {/* Profile menu */}
                     <div className="relative">
                         <button
                             onClick={() => setShowProfileMenu(v => !v)}
@@ -429,15 +431,23 @@ const EcoSwapDashboard = () => {
                             </div>
                         </>
                     )}
+
+                    {/* ── Swap Requests Tab ── */}
+                    {activeTab === 'swapRequests' && (
+                        <SwapRequests userId={userId} />
+                    )}
+
+                    {/* ── Settings Tab ── */}
+                    {activeTab === 'settings' && (
+                        <Settings onBack={() => setActiveTab('dashboard')} />
+                    )}
                 </div>
             </main>
 
-            {/* List Item Modal */}
             {showModal && (
                 <ListItemModal onClose={() => setShowModal(false)} onSuccess={handleListSuccess} />
             )}
 
-            {/* Close profile menu on outside click */}
             {showProfileMenu && (
                 <div className="fixed inset-0 z-40" onClick={() => setShowProfileMenu(false)} />
             )}
