@@ -1,9 +1,12 @@
 package bg.schoolinventory.backend.controller.auth;
 
+import bg.schoolinventory.backend.dto.ChangePasswordDto;
 import bg.schoolinventory.backend.dto.LoginRequestDto;
+import bg.schoolinventory.backend.dto.LoginResponseDto;
 import bg.schoolinventory.backend.dto.RegisterRequestDto;
 import bg.schoolinventory.backend.service.auth.AuthorizationService;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,16 +23,15 @@ public class AuthorizationController {
         authorizationService.register(registerRequestDto);
     }
 
-    @GetMapping("/login")
-    private void loginUser(@RequestBody @Valid LoginRequestDto loginRequestDto) {
-        authorizationService.login(loginRequestDto);
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> loginUser(@RequestBody @Valid LoginRequestDto loginRequestDto) {
+        LoginResponseDto response = authorizationService.login(loginRequestDto);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/changepass")
-    private void changePassword(@RequestBody String username,
-                                @RequestBody String oldPassword,
-                                @RequestBody String newPassword) {
-        authorizationService.changePassword(username, oldPassword, newPassword);
+    private void changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
+        authorizationService.changePassword(changePasswordDto);
     }
 
     @DeleteMapping("/delete")

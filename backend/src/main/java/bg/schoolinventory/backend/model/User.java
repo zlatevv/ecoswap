@@ -1,10 +1,12 @@
 package bg.schoolinventory.backend.model;
 
 import bg.schoolinventory.backend.model.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -26,9 +28,10 @@ public class User {
     @Column(unique = true)
     private String phoneNumber;
 
-    @Column(nullable = false)
+    @Column
     private String profilePictureURL;
 
     @OneToMany(mappedBy = "user")
-    private ArrayList<Product> products = new ArrayList<>();
+    @JsonIgnore
+    private List<Product> products = new ArrayList<>();
 }

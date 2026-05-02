@@ -1,5 +1,6 @@
 package bg.schoolinventory.backend.service.auth;
 
+import bg.schoolinventory.backend.dto.ChangePasswordDto;
 import bg.schoolinventory.backend.dto.LoginRequestDto;
 import bg.schoolinventory.backend.dto.LoginResponseDto;
 import bg.schoolinventory.backend.dto.RegisterRequestDto;
@@ -44,11 +45,13 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
         User user = new User();
 
+        user.setUsername(registerRequest.getUsername());
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setFirstName(registerRequest.getFirstName());
         user.setLastName(registerRequest.getLastName());
         user.setPhoneNumber(registerRequest.getPhoneNumber());
+        user.setProfilePictureURL(registerRequest.getProfilePictureUrl());
 
         if (userRepository.count() == 0) {
             user.setRole(Role.ADMIN);
@@ -65,7 +68,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword()) || loginRequestDto.getPassword().isEmpty()) {
             throw new InvalidCredentialsException("Invalid username or password");
         }
-        String token = jwtUtils.generateToken(user.getUsername(), user.getRole().name());
+        String token = jwtUtils.generateToken(user.getUsername(), user.getRole().name(), user.getId());
 
         return new LoginResponseDto(token, user.getUsername(), user.getRole(), user.getId());
     }
@@ -78,7 +81,11 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     }
 
     @Override
-    public void changePassword(String username, String oldPassword, String newPassword) {
+    public void changePassword(ChangePasswordDto changePasswordDto) {
+        String oldPassword = changePasswordDto.getOldPassword();
+        String newPassword = changePasswordDto.getNewPassword();
+        String username = changePasswordDto.getUsername();
+
         userRepository.findByUsername(username).ifPresent(user -> {
             if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
                 throw new PasswordsDismantlementException("Passwords do not match");

@@ -6,11 +6,13 @@ import lombok.Data;
 
 @Data
 public class RegisterRequestDto {
+
     @Pattern(
-            regexp = "^[a-zA-Z0-9._-]{3,}$\n",
+            regexp = "^[a-zA-Z0-9._-]{3,}$",
             message = "Invalid username!"
     )
     private String username;
+
     @Pattern(
             regexp = "^[A-Z][a-zA-Z '.-]*[A-Za-z][^-]$",
             message = "Invalid First Name!"
@@ -25,17 +27,18 @@ public class RegisterRequestDto {
 
     @Email(
             regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}",
-            message = "Invalid Email!")
+            message = "Invalid Email!"
+    )
     private String email;
 
     @Pattern(
-            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{8,}$",
+            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&{}#^()_+-]).{8,}$",
             message = "Password Must Contain At Least 1 lowercase letter, 1 uppercase letter, 1 digit and 1 special symbol!"
     )
     private String password;
 
     @Pattern(
-            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{8,}$",
+            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&{}#^()_+-]).{8,}$",
             message = "Password Must Contain At Least 1 lowercase letter, 1 uppercase letter, 1 digit and 1 special symbol!"
     )
     private String confirmPassword;
@@ -45,4 +48,6 @@ public class RegisterRequestDto {
             message = "Invalid phone number!"
     )
     private String phoneNumber;
+
+    private String profilePictureUrl;
 }
