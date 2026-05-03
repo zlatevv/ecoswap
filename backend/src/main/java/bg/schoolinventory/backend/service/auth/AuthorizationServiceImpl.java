@@ -95,4 +95,9 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             user.setPassword(passwordEncoder.encode(newPassword));
         });
     }
+
+    @Override
+    public User getUserById(Long id){
+        return userRepository.findById(id).get();
+    }
 }

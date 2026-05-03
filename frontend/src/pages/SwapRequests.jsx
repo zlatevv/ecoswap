@@ -121,7 +121,7 @@ function SwapCard({ swap, isIncoming, onStatusUpdate }) {
     );
 }
 
-export default function SwapRequests({ userId }) {
+export default function SwapRequests({ userId, onSwapAction }) {
     const [tab, setTab] = useState('incoming');
     const [incoming, setIncoming] = useState([]);
     const [outgoing, setOutgoing] = useState([]);
@@ -146,6 +146,13 @@ export default function SwapRequests({ userId }) {
 
     useEffect(() => { fetchSwaps(); }, [fetchSwaps]);
 
+    const handleStatusUpdate = useCallback(() => {
+        fetchSwaps();
+        if (onSwapAction) {
+            onSwapAction();
+        }
+    }, [fetchSwaps, onSwapAction]);
+
     const current = tab === 'incoming' ? incoming : outgoing;
 
     return (
@@ -155,7 +162,6 @@ export default function SwapRequests({ userId }) {
                 <p className="text-stone-500 text-sm mt-1">Manage incoming and outgoing swap proposals.</p>
             </div>
 
-            {/* Tab toggle */}
             <div className="flex bg-stone-100 rounded-xl p-1 w-fit mb-6 gap-1">
                 {['incoming', 'outgoing'].map(t => (
                     <button
@@ -194,7 +200,7 @@ export default function SwapRequests({ userId }) {
                         key={swap.id}
                         swap={swap}
                         isIncoming={tab === 'incoming'}
-                        onStatusUpdate={fetchSwaps}
+                        onStatusUpdate={handleStatusUpdate}
                     />
                 ))}
             </div>

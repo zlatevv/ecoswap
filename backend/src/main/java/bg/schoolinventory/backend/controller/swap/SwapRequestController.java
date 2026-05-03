@@ -41,6 +41,11 @@ public class SwapRequestController {
         return ResponseEntity.ok(swapRequestService.getOutgoingRequests(userId));
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<SwapRequest>> getAllRequests() {
+        return ResponseEntity.ok(swapRequestService.getAllRequests());
+    }
+
     // Accept or reject a swap request
     @PutMapping("/{swapId}/status")
     public ResponseEntity<SwapRequest> updateStatus(@PathVariable Long swapId,

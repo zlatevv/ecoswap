@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     User, Mail, Phone, Shield, Key, Trash2, Eye, EyeOff,
-    AlertTriangle, Check, X, ArrowLeft, Image
+    AlertTriangle, Check, X, ArrowLeft, Image as ImageIcon
 } from 'lucide-react';
 
 const API = 'http://localhost:8080/api';
@@ -222,9 +222,29 @@ export default function Settings({ onBack }) {
     const token = sessionStorage.getItem('jwt_token');
     const jwt = parseJwt(token);
     const username = jwt?.sub || 'User';
+    const userId = jwt?.userId;
 
-    // You can enrich this by fetching GET /api/users/me if you add that endpoint later.
-    // For now we show what's available from the JWT + placeholders.
+    // 1. Add state for the profile picture
+    const [profilePic, setProfilePic] = useState(null);
+
+    // 2. Fetch the profile picture when the component mounts
+    useEffect(() => {
+        const fetchUserData = async () => {
+            if (!userId) return;
+            try {
+                // Using the endpoint we fixed earlier
+                const res = await fetch(`${API}/auth/${userId}`, { headers: authHeaders() });
+                if (res.ok) {
+                    const data = await res.json();
+                    setProfilePic(data.profilePictureURL);
+                }
+            } catch (e) {
+                console.error("Failed to load profile pic in settings:", e);
+            }
+        };
+        fetchUserData();
+    }, [userId]);
+
     const userInfo = [
         { icon: User,   label: 'Username',     value: username },
         { icon: Mail,   label: 'Role',         value: jwt?.role },
@@ -253,9 +273,19 @@ export default function Settings({ onBack }) {
                 {/* Profile Info */}
                 <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-6">
                     <div className="flex items-center gap-4 mb-6">
-                        <div className="w-16 h-16 rounded-2xl bg-emerald-500 flex items-center justify-center text-white font-bold text-2xl shadow-sm">
-                            {username.charAt(0).toUpperCase()}
-                        </div>
+                        {/* 3. Updated Avatar Logic to show Image or Initial */}
+                        {profilePic ? (
+                            <img
+                                src={profilePic}
+                                alt="Profile"
+                                className="w-16 h-16 rounded-2xl object-cover shadow-sm border border-stone-100"
+                            />
+                        ) : (
+                            <div className="w-16 h-16 rounded-2xl bg-emerald-500 flex items-center justify-center text-white font-bold text-2xl shadow-sm">
+                                {username.charAt(0).toUpperCase()}
+                            </div>
+                        )}
+
                         <div>
                             <h2 className="text-xl font-bold text-stone-900">{username}</h2>
                             <span className="inline-block mt-1 text-xs font-semibold px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-lg">
@@ -271,10 +301,7 @@ export default function Settings({ onBack }) {
                     </div>
                 </div>
 
-                {/* Change Password */}
                 <ChangePasswordSection username={username} />
-
-                {/* Delete Account */}
                 <DeleteAccountSection username={username} />
             </div>
         </div>

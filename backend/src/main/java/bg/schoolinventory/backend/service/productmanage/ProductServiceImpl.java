@@ -60,17 +60,17 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product getProduct(Long productId) {
-        return productRepository.findById(productId)
+        return productRepository.findByIdWithImages(productId)
                 .orElseThrow(() -> new ProductDoesNotExistException("Product does not exist"));
     }
 
     @Override
     public List<Product> getUserProducts(Long userId) {
-        return productRepository.findByUserId(userId);
+        return productRepository.findByUserIdWithImages(userId);
     }
 
     @Override
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        return productRepository.findAllWithImages();
     }
 }

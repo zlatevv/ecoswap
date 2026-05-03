@@ -4,6 +4,7 @@ import bg.schoolinventory.backend.dto.ChangePasswordDto;
 import bg.schoolinventory.backend.dto.LoginRequestDto;
 import bg.schoolinventory.backend.dto.LoginResponseDto;
 import bg.schoolinventory.backend.dto.RegisterRequestDto;
+import bg.schoolinventory.backend.model.User;
 import bg.schoolinventory.backend.service.auth.AuthorizationService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -37,5 +38,10 @@ public class AuthorizationController {
     @DeleteMapping("/delete")
     private void deleteAccount(@RequestBody String username) {
         authorizationService.deleteAccount(username);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(authorizationService.getUserById(id));
     }
 }
