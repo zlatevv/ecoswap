@@ -2,12 +2,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
     Leaf, LayoutDashboard, Tag, RefreshCw, TrendingUp, Award,
     LogOut, Plus, MapPin, Search, X, ChevronDown,
-    PackageOpen, Trash2, DollarSign, ImagePlus, ChevronLeft, ChevronRight
+    PackageOpen, Trash2, DollarSign, ImagePlus, ChevronLeft, ChevronRight, Shield
 } from 'lucide-react';
 import { Settings as SettingsIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Settings from './Settings';
 import SwapRequests from './SwapRequests';
+import AdminPanel from "./AdminPanel.jsx";
 
 function parseJwt(token) {
     try { return JSON.parse(atob(token.split('.')[1])); } catch { return null; }
@@ -242,6 +243,7 @@ const EcoSwapDashboard = () => {
 
     const token = sessionStorage.getItem('jwt_token');
     const jwt = parseJwt(token);
+    const isAdmin = jwt?.role === 'ADMIN';
     const username = jwt?.sub || 'User';
     const userId = jwt?.userId || null;
 
@@ -351,6 +353,7 @@ const EcoSwapDashboard = () => {
         { key: 'myListings',   label: 'My Listings',   icon: Tag },
         { key: 'swapRequests', label: 'Swap Requests', icon: RefreshCw },
         { key: 'settings',     label: 'Settings',      icon: SettingsIcon },
+        ...(isAdmin ? [{ key: 'admin', label: 'Admin', icon: Shield }] : []),
     ];
 
     return (
@@ -515,6 +518,7 @@ const EcoSwapDashboard = () => {
 
                     {activeTab === 'swapRequests' && <SwapRequests userId={userId} onSwapAction={fetchUserStats} />}
                     {activeTab === 'settings' && <Settings onBack={() => setActiveTab('dashboard')} />}
+                    {activeTab === 'admin' && isAdmin && <AdminPanel />}
                 </div>
             </main>
 

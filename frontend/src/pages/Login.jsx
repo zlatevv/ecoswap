@@ -13,15 +13,17 @@ export default function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
         setIsLoading(true);
+        setError('');
         try {
             const response = await api.post('/auth/login', formData);
             sessionStorage.setItem('jwt_token', response.data.token);
             navigate('/dashboard');
         } catch (error) {
-            console.error(error.response?.data);
-            setError("Login failed. Please check your credentials.");
+            const message = error.response?.data?.message
+                || error.response?.data
+                || 'Login failed. Please try again.';
+            setError(message);
         } finally {
             setIsLoading(false);
         }
