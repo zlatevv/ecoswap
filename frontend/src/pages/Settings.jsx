@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
-    User, Mail, Phone, Shield, Key, Trash2, Eye, EyeOff,
-    AlertTriangle, Check, X, ArrowLeft, Image as ImageIcon
+    User, Mail, Shield, Key, Trash2, Eye, EyeOff,
+    AlertTriangle, Check, X, ArrowLeft, Moon, Sun
 } from 'lucide-react';
+import { useDarkMode } from '../components/useDarkMode';
 
 const API = 'http://localhost:8080/api';
 
@@ -19,15 +20,15 @@ function authHeaders() {
 
 function InfoRow({ icon: Icon, label, value }) {
     return (
-        <div className="flex items-center gap-4 py-4 border-b border-stone-100 last:border-0">
-            <div className="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center flex-shrink-0">
-                <Icon className="h-4 w-4 text-stone-400" />
+        <div className="flex items-center gap-4 py-4 border-b border-stone-100 dark:border-stone-700 last:border-0">
+            <div className="w-8 h-8 rounded-lg bg-stone-100 dark:bg-stone-700 flex items-center justify-center flex-shrink-0">
+                <Icon className="h-4 w-4 text-stone-400 dark:text-stone-400" />
             </div>
             <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-0.5">{label}</p>
-                <p className="text-sm font-medium text-stone-800 truncate">{value || '—'}</p>
+                <p className="text-xs font-semibold text-stone-400 dark:text-stone-500 uppercase tracking-wide mb-0.5">{label}</p>
+                <p className="text-sm font-medium text-stone-800 dark:text-stone-200 truncate">{value || '—'}</p>
             </div>
-            <span className="text-xs text-stone-300 font-medium">Read only</span>
+            <span className="text-xs text-stone-300 dark:text-stone-600 font-medium">Read only</span>
         </div>
     );
 }
@@ -73,19 +74,19 @@ function ChangePasswordSection({ username }) {
 
     const PasswordInput = ({ field, label, showKey }) => (
         <div>
-            <label className="block text-xs font-semibold text-stone-500 mb-1.5">{label}</label>
+            <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 mb-1.5">{label}</label>
             <div className="relative">
                 <input
                     type={show[showKey] ? 'text' : 'password'}
                     value={form[field]}
                     onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
-                    className="w-full px-4 py-2.5 pr-10 bg-stone-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-4 py-2.5 pr-10 bg-stone-100 dark:bg-stone-700 dark:text-white rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500"
                     placeholder="••••••••"
                 />
                 <button
                     type="button"
                     onClick={() => setShow(s => ({ ...s, [showKey]: !s[showKey] }))}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300"
                 >
                     {show[showKey] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -94,14 +95,14 @@ function ChangePasswordSection({ username }) {
     );
 
     return (
-        <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-6">
+        <div className="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm p-6">
             <div className="flex items-center gap-3 mb-6">
-                <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center">
-                    <Key className="h-4 w-4 text-emerald-600" />
+                <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center">
+                    <Key className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <div>
-                    <h3 className="font-bold text-stone-900 text-base">Change Password</h3>
-                    <p className="text-xs text-stone-400">Update your account password</p>
+                    <h3 className="font-bold text-stone-900 dark:text-white text-base">Change Password</h3>
+                    <p className="text-xs text-stone-400 dark:text-stone-500">Update your account password</p>
                 </div>
             </div>
 
@@ -112,12 +113,12 @@ function ChangePasswordSection({ username }) {
             </div>
 
             {status === 'success' && (
-                <div className="mt-4 flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 px-4 py-2.5 rounded-xl">
+                <div className="mt-4 flex items-center gap-2 text-sm text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-4 py-2.5 rounded-xl">
                     <Check className="h-4 w-4" /> Password updated successfully.
                 </div>
             )}
             {status === 'error' && (
-                <div className="mt-4 flex items-center gap-2 text-sm text-rose-700 bg-rose-50 px-4 py-2.5 rounded-xl">
+                <div className="mt-4 flex items-center gap-2 text-sm text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/30 px-4 py-2.5 rounded-xl">
                     <X className="h-4 w-4" /> {err}
                 </div>
             )}
@@ -161,29 +162,29 @@ function DeleteAccountSection({ username }) {
     };
 
     return (
-        <div className="bg-white rounded-2xl border border-rose-200 shadow-sm p-6">
+        <div className="bg-white dark:bg-stone-800 rounded-2xl border border-rose-200 dark:border-rose-900/50 shadow-sm p-6">
             <div className="flex items-center gap-3 mb-4">
-                <div className="w-9 h-9 rounded-xl bg-rose-100 flex items-center justify-center">
-                    <Trash2 className="h-4 w-4 text-rose-600" />
+                <div className="w-9 h-9 rounded-xl bg-rose-100 dark:bg-rose-900/40 flex items-center justify-center">
+                    <Trash2 className="h-4 w-4 text-rose-600 dark:text-rose-400" />
                 </div>
                 <div>
-                    <h3 className="font-bold text-stone-900 text-base">Delete Account</h3>
-                    <p className="text-xs text-stone-400">Permanently remove your account and all data</p>
+                    <h3 className="font-bold text-stone-900 dark:text-white text-base">Delete Account</h3>
+                    <p className="text-xs text-stone-400 dark:text-stone-500">Permanently remove your account and all data</p>
                 </div>
             </div>
 
             {!showPanel ? (
                 <button
                     onClick={() => setShowPanel(true)}
-                    className="w-full py-2.5 border border-rose-300 text-rose-600 rounded-xl text-sm font-semibold hover:bg-rose-50 transition-colors"
+                    className="w-full py-2.5 border border-rose-300 dark:border-rose-700 text-rose-600 dark:text-rose-400 rounded-xl text-sm font-semibold hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-colors"
                 >
                     Delete my account
                 </button>
             ) : (
                 <div className="space-y-4">
-                    <div className="flex items-start gap-3 bg-rose-50 border border-rose-200 rounded-xl p-4">
+                    <div className="flex items-start gap-3 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-xl p-4">
                         <AlertTriangle className="h-4 w-4 text-rose-500 flex-shrink-0 mt-0.5" />
-                        <p className="text-xs text-rose-700 leading-relaxed">
+                        <p className="text-xs text-rose-700 dark:text-rose-300 leading-relaxed">
                             This action is <strong>irreversible</strong>. All your listings and data will be permanently deleted.
                             Type your username <strong>{username}</strong> to confirm.
                         </p>
@@ -192,13 +193,13 @@ function DeleteAccountSection({ username }) {
                         value={confirm}
                         onChange={e => { setConfirm(e.target.value); setErr(''); }}
                         placeholder={`Type "${username}" to confirm`}
-                        className="w-full px-4 py-2.5 bg-stone-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-rose-400"
+                        className="w-full px-4 py-2.5 bg-stone-100 dark:bg-stone-700 dark:text-white rounded-xl text-sm outline-none focus:ring-2 focus:ring-rose-400"
                     />
-                    {err && <p className="text-xs text-rose-600">{err}</p>}
+                    {err && <p className="text-xs text-rose-600 dark:text-rose-400">{err}</p>}
                     <div className="flex gap-3">
                         <button
                             onClick={() => { setShowPanel(false); setConfirm(''); setErr(''); }}
-                            className="flex-1 py-2.5 border border-stone-200 text-stone-600 rounded-xl text-sm font-semibold hover:bg-stone-50 transition-colors"
+                            className="flex-1 py-2.5 border border-stone-200 dark:border-stone-600 text-stone-600 dark:text-stone-300 rounded-xl text-sm font-semibold hover:bg-stone-50 dark:hover:bg-stone-700 transition-colors"
                         >
                             Cancel
                         </button>
@@ -219,20 +220,18 @@ function DeleteAccountSection({ username }) {
 // ── main ──────────────────────────────────────────────────────────────────────
 
 export default function Settings({ onBack }) {
+    const [isDark, setIsDark] = useDarkMode();
     const token = sessionStorage.getItem('jwt_token');
     const jwt = parseJwt(token);
     const username = jwt?.sub || 'User';
     const userId = jwt?.userId;
 
-    // 1. Add state for the profile picture
     const [profilePic, setProfilePic] = useState(null);
 
-    // 2. Fetch the profile picture when the component mounts
     useEffect(() => {
         const fetchUserData = async () => {
             if (!userId) return;
             try {
-                // Using the endpoint we fixed earlier
                 const res = await fetch(`${API}/auth/${userId}`, { headers: authHeaders() });
                 if (res.ok) {
                     const data = await res.json();
@@ -251,6 +250,18 @@ export default function Settings({ onBack }) {
         { icon: Shield, label: 'Account ID',   value: jwt?.userId ? `#${jwt.userId}` : '—' },
     ];
 
+    const toggleTheme = () => {
+        setIsDark((prev) => {
+            const nextMode = !prev;
+            if (nextMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            return nextMode;
+        });
+    };
+
     return (
         <div className="flex-1 overflow-auto p-8 max-w-2xl mx-auto w-full">
             {/* Header */}
@@ -258,27 +269,52 @@ export default function Settings({ onBack }) {
                 {onBack && (
                     <button
                         onClick={onBack}
-                        className="w-9 h-9 rounded-xl border border-stone-200 flex items-center justify-center hover:bg-stone-100 transition-colors"
+                        className="w-9 h-9 rounded-xl border border-stone-200 dark:border-stone-700 flex items-center justify-center hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
                     >
-                        <ArrowLeft className="h-4 w-4 text-stone-500" />
+                        <ArrowLeft className="h-4 w-4 text-stone-500 dark:text-stone-400" />
                     </button>
                 )}
                 <div>
-                    <h1 className="text-3xl font-bold text-stone-900 tracking-tight">Settings</h1>
-                    <p className="text-stone-500 text-sm mt-1">Manage your account preferences</p>
+                    <h1 className="text-3xl font-bold text-stone-900 dark:text-white tracking-tight">Settings</h1>
+                    <p className="text-stone-500 dark:text-stone-400 text-sm mt-1">Manage your account preferences</p>
                 </div>
             </div>
 
+            <div className="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm p-6">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-stone-100 dark:bg-stone-700 flex items-center justify-center">
+                            {isDark ? <Moon className="h-4 w-4 text-stone-400 dark:text-stone-300" /> : <Sun className="h-4 w-4 text-amber-500" />}
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-stone-900 dark:text-white text-base">Dark Mode</h3>
+                            <p className="text-xs text-stone-400 dark:text-stone-500">Switch between light and dark theme</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={toggleTheme}
+                        className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
+                            isDark ? 'bg-emerald-500' : 'bg-stone-200 dark:bg-stone-600'
+                        }`}
+                    >
+                        <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-300 ${
+                            isDark ? 'translate-x-6' : 'translate-x-0'
+                        }`} />
+                    </button>
+                </div>
+            </div>
+
+            <br/>
+
             <div className="space-y-6">
                 {/* Profile Info */}
-                <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-6">
+                <div className="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm p-6">
                     <div className="flex items-center gap-4 mb-6">
-                        {/* 3. Updated Avatar Logic to show Image or Initial */}
                         {profilePic ? (
                             <img
                                 src={profilePic}
                                 alt="Profile"
-                                className="w-16 h-16 rounded-2xl object-cover shadow-sm border border-stone-100"
+                                className="w-16 h-16 rounded-2xl object-cover shadow-sm border border-stone-100 dark:border-stone-700"
                             />
                         ) : (
                             <div className="w-16 h-16 rounded-2xl bg-emerald-500 flex items-center justify-center text-white font-bold text-2xl shadow-sm">
@@ -287,14 +323,14 @@ export default function Settings({ onBack }) {
                         )}
 
                         <div>
-                            <h2 className="text-xl font-bold text-stone-900">{username}</h2>
-                            <span className="inline-block mt-1 text-xs font-semibold px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-lg">
+                            <h2 className="text-xl font-bold text-stone-900 dark:text-white">{username}</h2>
+                            <span className="inline-block mt-1 text-xs font-semibold px-2.5 py-1 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 rounded-lg">
                                 {jwt?.role || 'USER'}
                             </span>
                         </div>
                     </div>
 
-                    <div className="divide-y divide-stone-100">
+                    <div className="divide-y divide-stone-100 dark:divide-stone-700">
                         {userInfo.map((row, i) => (
                             <InfoRow key={i} {...row} />
                         ))}

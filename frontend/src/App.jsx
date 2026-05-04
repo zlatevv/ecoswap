@@ -4,8 +4,10 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import ProductDetail from './pages/ProductDetail';
+import {useDarkMode} from "./components/UseDarkMode.jsx";
 
 export default function App() {
+    useDarkMode();
     return (
         <BrowserRouter>
             <Routes>
