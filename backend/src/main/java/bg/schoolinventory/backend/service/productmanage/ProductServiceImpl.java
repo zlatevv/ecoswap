@@ -71,6 +71,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> getAllProducts() {
-        return productRepository.findAllWithImages();
+        return productRepository.findAllWithImages()
+                .stream()
+                .filter(Product::isAvailable)
+                .toList();
     }
 }

@@ -28,6 +28,7 @@ public class Product {
     private List<String> imageUrls = new ArrayList<>();
 
     private BigDecimal productPrice;
+    private boolean isAvailable = true;
 
     @ManyToOne
     @JoinColumn(
@@ -36,4 +37,11 @@ public class Product {
     )
     @JsonIgnoreProperties("products")
     private User user;
+
+    public void setUnavailable() {
+        isAvailable = false;
+    }
+    public void setAvailable() {
+        isAvailable = true;
+    }
 }

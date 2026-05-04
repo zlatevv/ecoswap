@@ -74,6 +74,8 @@ public class SwapRequestService {
 
         User requester = swap.getRequester();
         User productOwner = swap.getRequestedProduct().getUser();
+        Product offeredProduct = swap.getOfferedProduct();
+        Product requestedProduct = swap.getRequestedProduct();
 
         // Only the owner of the requested product can accept/reject
         if (!productOwner.getUsername().equals(username)) {
@@ -88,9 +90,13 @@ public class SwapRequestService {
 
             requester.setEcoPoints(currentRequesterPoints + 100);
             productOwner.setEcoPoints(currentOwnerPoints + 100);
+            offeredProduct.setUnavailable();
+            requestedProduct.setUnavailable();
 
             userRepository.save(requester);
             userRepository.save(productOwner);
+            productRepository.save(offeredProduct);
+            productRepository.save(requestedProduct);
         }
         return swapRequestRepository.save(swap);
     }
