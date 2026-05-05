@@ -1,17 +1,24 @@
+require('dotenv').config();
+
 const amqp = require('amqplib');
 const nodemailer = require('nodemailer');
+
+console.log("=== DEBUGGING CREDENTIALS ===");
+console.log("USER:", process.env.EMAIL_USER);
+console.log("PASS:", process.env.EMAIL_PASS ? "Loaded (" + process.env.EMAIL_PASS.length + " chars)" : "UNDEFINED!");
+console.log("=============================");
 
 // 1. Настройки за личен Gmail
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'ecoswap@gmail.com',
-        pass: 'lydf dxri lqog zglp'
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
     }
 });
 
 async function start() {
-    const rabbitUrl = process.env.RABBITMQ_URL || 'amqp://127.0.0.1';
+    const rabbitUrl = process.env.RABBITMQ_URL;
     let connection;
 
     // 1. Повтаряме опитите за свързване, докато успеем
@@ -59,7 +66,7 @@ async function start() {
                     }
 
                     const mailOptions = {
-                        from: 'pennywiseaibest@gmail.com',
+                        from: process.env.EMAIL_USER,
                         to: recipient,
                         subject: data.title || "Inventory Notification",
                         text: data.message || "No message content"
@@ -71,8 +78,6 @@ async function start() {
                     channel.ack(msg);
                 } catch (error) {
                     console.error(`[!] Грешка при изпращане на имейл:`, error);
-                    // Важно: Потвърждаваме съобщението дори при грешка в имейла,
-                    // за да не блокираме опашката (освен ако не искаш да се препрати)
                     channel.ack(msg);
                 }
             }

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
     Leaf, LayoutDashboard, Tag, RefreshCw, TrendingUp, Award,
     LogOut, Plus, MapPin, Search, X, ChevronDown,
-    PackageOpen, Trash2, DollarSign, ImagePlus, ChevronLeft, ChevronRight, Shield
+    PackageOpen, Trash2, DollarSign, ImagePlus, ChevronLeft, ChevronRight, Shield, Bell
 } from 'lucide-react';
 import { Settings as SettingsIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -216,10 +216,12 @@ const EcoSwapDashboard = () => {
     const [error, setError] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [showNotifications, setShowNotifications] = useState(false);
     const [search, setSearch] = useState('');
     const [successfulSwapsCount, setSuccessfulSwapsCount] = useState(0);
     const [userEcoPoints, setUserEcoPoints] = useState(0);
     const [profilePic, setProfilePic] = useState(null);
+    const [notifications, setNotifications] = useState([]);
 
     const token = sessionStorage.getItem('jwt_token');
     const jwt = parseJwt(token);
@@ -269,7 +271,31 @@ const EcoSwapDashboard = () => {
         } catch (e) { console.error('Failed to fetch user stats:', e); }
     }, [userId, username]);
 
-    useEffect(() => { fetchAll(); fetchUserStats(); }, [fetchAll, fetchUserStats]);
+    const fetchNotifications = useCallback(async () => {
+        if (!username) return;
+        try {
+            const res = await fetch(`${API}/notifications/user/${username}`, { headers: authHeaders() });
+            if (res.ok) {
+                setNotifications(await res.json());
+            }
+        } catch (e) { console.error('Failed to fetch notifications:', e); }
+    }, [username]);
+
+    const markNotificationAsRead = async (id) => {
+        try {
+            const res = await fetch(`${API}/notifications/${id}/read`, { method: 'PUT', headers: authHeaders() });
+            if (res.ok) {
+                setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true, isRead: true } : n));
+            }
+        } catch (e) { console.error('Failed to mark notification as read:', e); }
+    };
+
+    useEffect(() => {
+        fetchAll();
+        fetchUserStats();
+        fetchNotifications();
+    }, [fetchAll, fetchUserStats, fetchNotifications]);
+
     useEffect(() => { if (activeTab === 'myListings') fetchMyListings(); }, [activeTab, fetchMyListings]);
 
     const handleLogout = () => { sessionStorage.removeItem('jwt_token'); window.location.href = '/login'; };
@@ -307,6 +333,8 @@ const EcoSwapDashboard = () => {
         { key: 'settings',     label: 'Settings',      icon: SettingsIcon },
         ...(isAdmin ? [{ key: 'admin', label: 'Admin', icon: Shield }] : []),
     ];
+
+    const unreadNotifications = notifications.filter(n => !(n.read || n.isRead));
 
     return (
         <div className="flex h-screen bg-stone-50 dark:bg-stone-900 font-sans text-stone-800 dark:text-stone-100">
@@ -357,33 +385,89 @@ const EcoSwapDashboard = () => {
                         />
                     </div>
 
-                    <div className="relative">
-                        <button
-                            onClick={() => setShowProfileMenu(v => !v)}
-                            className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors"
-                        >
-                            {profilePic ? (
-                                <img src={profilePic} alt="" className="h-9 w-9 rounded-full object-cover shadow-sm border border-stone-200 dark:border-stone-600" />
-                            ) : (
-                                <div className="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-sm shadow-sm">
-                                    {username.charAt(0).toUpperCase()}
+                    <div className="flex items-center gap-4">
+                        <div className="relative">
+                            <button
+                                onClick={() => {
+                                    setShowNotifications(!showNotifications);
+                                    setShowProfileMenu(false);
+                                }}
+                                className="relative p-2 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors text-stone-500 dark:text-stone-400"
+                            >
+                                <Bell className="h-5 w-5" />
+                                {unreadNotifications.length > 0 && (
+                                    <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 bg-rose-500 rounded-full border-2 border-white dark:border-stone-800"></span>
+                                )}
+                            </button>
+
+                            {showNotifications && (
+                                <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl shadow-lg z-50 overflow-hidden">
+                                    <div className="px-4 py-3 border-b border-stone-100 dark:border-stone-700 flex justify-between items-center bg-stone-50 dark:bg-stone-800">
+                                        <h3 className="font-bold text-sm text-stone-800 dark:text-white">Notifications</h3>
+                                        <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">
+                                            {unreadNotifications.length} New
+                                        </span>
+                                    </div>
+                                    <div className="max-h-[300px] overflow-y-auto">
+                                        {notifications.length === 0 ? (
+                                            <div className="p-6 text-center text-sm text-stone-500 dark:text-stone-400">
+                                                No notifications yet.
+                                            </div>
+                                        ) : (
+                                            notifications.slice().reverse().map(notification => {
+                                                const isRead = notification.read || notification.isRead;
+                                                return (
+                                                    <div
+                                                        key={notification.id}
+                                                        onClick={() => !isRead && markNotificationAsRead(notification.id)}
+                                                        className={`p-4 border-b border-stone-100 dark:border-stone-700 transition-colors ${isRead ? 'bg-white dark:bg-stone-800 opacity-70' : 'bg-emerald-50/50 dark:bg-emerald-900/10 cursor-pointer hover:bg-emerald-50 dark:hover:bg-emerald-900/20'}`}
+                                                    >
+                                                        <h4 className={`text-sm font-semibold mb-1 ${isRead ? 'text-stone-600 dark:text-stone-300' : 'text-stone-900 dark:text-white'}`}>
+                                                            {notification.title}
+                                                        </h4>
+                                                        <p className="text-xs text-stone-500 dark:text-stone-400 line-clamp-2">
+                                                            {notification.message}
+                                                        </p>
+                                                    </div>
+                                                )
+                                            })
+                                        )}
+                                    </div>
                                 </div>
                             )}
-                            <span className="text-sm font-semibold text-stone-700 dark:text-stone-200">{username}</span>
-                            <ChevronDown className="h-4 w-4 text-stone-400" />
-                        </button>
+                        </div>
 
-                        {showProfileMenu && (
-                            <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl shadow-lg py-1 z-50">
-                                <div className="px-4 py-2 border-b border-stone-100 dark:border-stone-700">
-                                    <p className="text-xs text-stone-400">Signed in as</p>
-                                    <p className="text-sm font-semibold text-stone-800 dark:text-white truncate">{username}</p>
+                        <div className="relative">
+                            <button
+                                onClick={() => {
+                                    setShowProfileMenu(!showProfileMenu);
+                                    setShowNotifications(false);
+                                }}
+                                className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors"
+                            >
+                                {profilePic ? (
+                                    <img src={profilePic} alt="" className="h-9 w-9 rounded-full object-cover shadow-sm border border-stone-200 dark:border-stone-600" />
+                                ) : (
+                                    <div className="h-9 w-9 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                                        {username.charAt(0).toUpperCase()}
+                                    </div>
+                                )}
+                                <span className="text-sm font-semibold text-stone-700 dark:text-stone-200">{username}</span>
+                                <ChevronDown className="h-4 w-4 text-stone-400" />
+                            </button>
+
+                            {showProfileMenu && (
+                                <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl shadow-lg py-1 z-50">
+                                    <div className="px-4 py-2 border-b border-stone-100 dark:border-stone-700">
+                                        <p className="text-xs text-stone-400">Signed in as</p>
+                                        <p className="text-sm font-semibold text-stone-800 dark:text-white truncate">{username}</p>
+                                    </div>
+                                    <button onClick={handleLogout} className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors">
+                                        <LogOut className="h-4 w-4" />Log Out
+                                    </button>
                                 </div>
-                                <button onClick={handleLogout} className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors">
-                                    <LogOut className="h-4 w-4" />Log Out
-                                </button>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </header>
 
@@ -449,7 +533,15 @@ const EcoSwapDashboard = () => {
             </main>
 
             {showModal && <ListItemModal onClose={() => setShowModal(false)} onSuccess={handleListSuccess} />}
-            {showProfileMenu && <div className="fixed inset-0 z-40" onClick={() => setShowProfileMenu(false)} />}
+            {(showProfileMenu || showNotifications) && (
+                <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => {
+                        setShowProfileMenu(false);
+                        setShowNotifications(false);
+                    }}
+                />
+            )}
         </div>
     );
 };
