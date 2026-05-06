@@ -14,7 +14,7 @@ function parseJwt(token) {
     try { return JSON.parse(atob(token.split('.')[1])); } catch { return null; }
 }
 
-const API = 'http://localhost:8080/api';
+const API = '/api';
 
 function authHeaders() {
     const token = sessionStorage.getItem('jwt_token');

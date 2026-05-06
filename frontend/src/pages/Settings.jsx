@@ -3,7 +3,7 @@ import {
     User, Mail, Shield, Key, Trash2, Eye, EyeOff,
     AlertTriangle, Check, X, ArrowLeft, Moon, Sun
 } from 'lucide-react';
-import { useDarkMode } from '../components/useDarkMode';
+import { useDarkMode } from '../components/UseDarkMode.jsx';
 
 const API = 'http://localhost:8080/api';
 

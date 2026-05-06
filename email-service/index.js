@@ -3,11 +3,6 @@ require('dotenv').config();
 const amqp = require('amqplib');
 const nodemailer = require('nodemailer');
 
-console.log("=== DEBUGGING CREDENTIALS ===");
-console.log("USER:", process.env.EMAIL_USER);
-console.log("PASS:", process.env.EMAIL_PASS ? "Loaded (" + process.env.EMAIL_PASS.length + " chars)" : "UNDEFINED!");
-console.log("=============================");
-
 // 1. Настройки за личен Gmail
 const transporter = nodemailer.createTransport({
     service: 'gmail',

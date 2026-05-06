@@ -17,6 +17,9 @@ export default function Login() {
         setError('');
         try {
             const response = await api.post('/auth/login', formData);
+            console.log('Response:', response);
+            console.log('Data:', response.data);
+            console.log('Token:', response.data.token);
             sessionStorage.setItem('jwt_token', response.data.token);
             navigate('/dashboard');
         } catch (error) {
