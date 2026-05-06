@@ -250,18 +250,6 @@ export default function Settings({ onBack }) {
         { icon: Shield, label: 'Account ID',   value: jwt?.userId ? `#${jwt.userId}` : '—' },
     ];
 
-    const toggleTheme = () => {
-        setIsDark((prev) => {
-            const nextMode = !prev;
-            if (nextMode) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-            return nextMode;
-        });
-    };
-
     return (
         <div className="flex-1 overflow-auto p-8 max-w-2xl mx-auto w-full">
             {/* Header */}
@@ -292,7 +280,7 @@ export default function Settings({ onBack }) {
                         </div>
                     </div>
                     <button
-                        onClick={toggleTheme}
+                        onClick={() => setIsDark(prev => !prev)}
                         className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
                             isDark ? 'bg-emerald-500' : 'bg-stone-200 dark:bg-stone-600'
                         }`}
