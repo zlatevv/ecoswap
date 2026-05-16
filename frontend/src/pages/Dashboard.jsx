@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
     Leaf, LayoutDashboard, Tag, RefreshCw, TrendingUp, Award,
     LogOut, Plus, MapPin, Search, X, ChevronDown,
-    PackageOpen, Trash2, DollarSign, ImagePlus, ChevronLeft, ChevronRight, Shield, Bell
+    PackageOpen, Trash2, Euro, ImagePlus, ChevronLeft, ChevronRight, Shield, Bell
 } from 'lucide-react';
 import { Settings as SettingsIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -93,7 +93,7 @@ function ProductCard({ item, onDelete, showDelete }) {
                 <p className="text-stone-500 dark:text-stone-400 text-xs line-clamp-2 mb-3">{item.productDescription}</p>
                 <div className="mt-auto flex items-center justify-between">
                     <span className="text-emerald-600 dark:text-emerald-400 font-bold text-sm flex items-center gap-1">
-                        <DollarSign className="h-3.5 w-3.5" />{Number(item.productPrice).toFixed(2)}
+                        <Euro className="h-3.5 w-3.5" />{Number(item.productPrice).toFixed(2)}
                     </span>
                     {item.user && (
                         <span className="text-xs text-stone-400 dark:text-stone-500 flex items-center gap-1">
@@ -190,7 +190,7 @@ function ListItemModal({ onClose, onSuccess }) {
                         <textarea rows={3} className="w-full px-4 py-2.5 bg-stone-100 dark:bg-stone-700 dark:text-white rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500 resize-none" placeholder="Describe the item, condition, etc." value={form.productDescription} onChange={e => setForm(f => ({ ...f, productDescription: e.target.value }))} />
                     </div>
                     <div>
-                        <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 mb-1.5">Price (USD) *</label>
+                        <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 mb-1.5">Price (EU) *</label>
                         <input type="number" min="0" step="0.01" className="w-full px-4 py-2.5 bg-stone-100 dark:bg-stone-700 dark:text-white rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="0.00" value={form.productPrice} onChange={e => setForm(f => ({ ...f, productPrice: e.target.value }))} />
                     </div>
                 </div>

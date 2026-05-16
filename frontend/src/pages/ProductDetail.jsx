@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-    ArrowLeft, DollarSign, User, Package, RefreshCw,
+    ArrowLeft, Euro, User, Package, RefreshCw,
     Check, X, ChevronDown, Loader, ChevronLeft, ChevronRight,
     Trash2, ImagePlus
 } from 'lucide-react';
@@ -246,7 +246,7 @@ export default function ProductDetail() {
                         <div>
                             <h1 className="text-3xl font-bold text-stone-900 tracking-tight mb-2">{product?.productName}</h1>
                             <span className="inline-flex items-center gap-1.5 text-emerald-700 font-bold text-xl">
-                                <DollarSign className="h-5 w-5" />{Number(product?.productPrice).toFixed(2)}
+                                <Euro className="h-5 w-5" />{Number(product?.productPrice).toFixed(2)}
                             </span>
                         </div>
 
