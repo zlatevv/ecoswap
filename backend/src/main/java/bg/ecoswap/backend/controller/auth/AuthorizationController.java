@@ -36,8 +36,9 @@ public class AuthorizationController {
     }
 
     @DeleteMapping("/delete")
-    private void deleteAccount(@RequestBody String username) {
+    private ResponseEntity<Void> deleteAccount(@RequestBody String username) {
         authorizationService.deleteAccount(username);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")

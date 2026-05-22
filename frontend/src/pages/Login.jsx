@@ -23,9 +23,9 @@ export default function Login() {
             sessionStorage.setItem('jwt_token', response.data.token);
             navigate('/dashboard');
         } catch (error) {
-            const message = error.response?.data?.message
-                || error.response?.data
-                || 'Login failed. Please try again.';
+            const data = error.response?.data;
+            const message = (typeof data === 'string' ? data : data?.message)
+                || 'Invalid username or password.';
             setError(message);
         } finally {
             setIsLoading(false);

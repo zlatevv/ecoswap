@@ -10,6 +10,7 @@ import bg.ecoswap.backend.repository.UserRepository;
 import bg.ecoswap.backend.security.JwtUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -105,12 +106,15 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         String newPassword = changePasswordDto.getNewPassword();
         String username = changePasswordDto.getUsername();
 
-        userRepository.findByUsername(username).ifPresent(user -> {
-            if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-                throw new PasswordsDismantlementException("Passwords do not match");
-            }
-            user.setPassword(passwordEncoder.encode(newPassword));
-        });
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new PasswordsDismantlementException("Passwords do not match");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 
     @Override

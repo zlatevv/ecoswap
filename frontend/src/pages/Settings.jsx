@@ -33,12 +33,39 @@ function InfoRow({ icon: Icon, label, value }) {
     );
 }
 
+function PasswordInput({ field, label, showKey, value, show, onChange, onToggleShow }) {
+    return (
+        <div>
+            <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 mb-1.5">{label}</label>
+            <div className="relative">
+                <input
+                    type={show ? 'text' : 'password'}
+                    value={value}
+                    onChange={e => onChange(field, e.target.value)}
+                    className="w-full px-4 py-2.5 pr-10 bg-stone-100 dark:bg-stone-700 dark:text-white rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500"
+                    placeholder="••••••••"
+                />
+                <button
+                    type="button"
+                    onClick={() => onToggleShow(showKey)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300"
+                >
+                    {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+            </div>
+        </div>
+    );
+}
+
 function ChangePasswordSection({ username }) {
     const [form, setForm] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
     const [show, setShow] = useState({ old: false, new: false, confirm: false });
     const [status, setStatus] = useState(null); // null | 'success' | 'error'
     const [err, setErr] = useState('');
     const [loading, setLoading] = useState(false);
+
+    const handleChange = (field, value) => setForm(f => ({ ...f, [field]: value }));
+    const handleToggleShow = (key) => setShow(s => ({ ...s, [key]: !s[key] }));
 
     const handleSubmit = async () => {
         if (!form.oldPassword || !form.newPassword || !form.confirmPassword) {
@@ -72,28 +99,6 @@ function ChangePasswordSection({ username }) {
         }
     };
 
-    const PasswordInput = ({ field, label, showKey }) => (
-        <div>
-            <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 mb-1.5">{label}</label>
-            <div className="relative">
-                <input
-                    type={show[showKey] ? 'text' : 'password'}
-                    value={form[field]}
-                    onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
-                    className="w-full px-4 py-2.5 pr-10 bg-stone-100 dark:bg-stone-700 dark:text-white rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500"
-                    placeholder="••••••••"
-                />
-                <button
-                    type="button"
-                    onClick={() => setShow(s => ({ ...s, [showKey]: !s[showKey] }))}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300"
-                >
-                    {show[showKey] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-            </div>
-        </div>
-    );
-
     return (
         <div className="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm p-6">
             <div className="flex items-center gap-3 mb-6">
@@ -107,9 +112,21 @@ function ChangePasswordSection({ username }) {
             </div>
 
             <div className="space-y-4">
-                <PasswordInput field="oldPassword" label="Current Password" showKey="old" />
-                <PasswordInput field="newPassword" label="New Password" showKey="new" />
-                <PasswordInput field="confirmPassword" label="Confirm New Password" showKey="confirm" />
+                <PasswordInput
+                    field="oldPassword" label="Current Password" showKey="old"
+                    value={form.oldPassword} show={show.old}
+                    onChange={handleChange} onToggleShow={handleToggleShow}
+                />
+                <PasswordInput
+                    field="newPassword" label="New Password" showKey="new"
+                    value={form.newPassword} show={show.new}
+                    onChange={handleChange} onToggleShow={handleToggleShow}
+                />
+                <PasswordInput
+                    field="confirmPassword" label="Confirm New Password" showKey="confirm"
+                    value={form.confirmPassword} show={show.confirm}
+                    onChange={handleChange} onToggleShow={handleToggleShow}
+                />
             </div>
 
             {status === 'success' && (
@@ -148,8 +165,11 @@ function DeleteAccountSection({ username }) {
         try {
             const res = await fetch(`${API}/auth/delete`, {
                 method: 'DELETE',
-                headers: authHeaders(),
-                body: JSON.stringify(username),
+                headers: {
+                    ...authHeaders(),
+                    'Content-Type': 'text/plain',
+                },
+                body: username,
             });
             if (!res.ok) throw new Error('Failed to delete account.');
             sessionStorage.removeItem('jwt_token');
@@ -245,9 +265,9 @@ export default function Settings({ onBack }) {
     }, [userId]);
 
     const userInfo = [
-        { icon: User,   label: 'Username',     value: username },
-        { icon: Mail,   label: 'Role',         value: jwt?.role },
-        { icon: Shield, label: 'Account ID',   value: jwt?.userId ? `#${jwt.userId}` : '—' },
+        { icon: User,   label: 'Username',   value: username },
+        { icon: Mail,   label: 'Role',       value: jwt?.role },
+        { icon: Shield, label: 'Account ID', value: jwt?.userId ? `#${jwt.userId}` : '—' },
     ];
 
     return (
@@ -292,7 +312,7 @@ export default function Settings({ onBack }) {
                 </div>
             </div>
 
-            <br/>
+            <br />
 
             <div className="space-y-6">
                 {/* Profile Info */}
